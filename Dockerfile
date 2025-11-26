@@ -2,5 +2,5 @@ FROM node:18
 WORKDIR /app
 COPY package.json .
 COPY test.js .
-RUN npm install --omit=dev || true
+RUN npm install 
 CMD ["npm", "start"]
