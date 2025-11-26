@@ -1,40 +1,31 @@
-name: Docker Image Vulnerability Scan
+name: Node Docker Image Scan
 
 on:
   push:
     branches: [ main ]
-  pull_request:
 
 jobs:
-  scan-docker-image:
+  docker-scan:
     runs-on: ubuntu-latest
 
     steps:
+      - uses: actions/checkout@v4
 
-      - name: Checkout repository
-        uses: actions/checkout@v4
-
-      - name: Show Docker version
-        run: docker version
-
-  
       - name: Build Docker image
-        run: |
-          docker build -t myapp:latest .
-      - name: Scan Docker image with Trivy
+        run: docker build -t demo-node:latest .
+
+      - name: Scan image with Trivy
         uses: aquasecurity/trivy-action@master
         with:
-          image-ref: 'myapp:latest'
-          format: 'table'
-          exit-code: '1'       # Make job fail if vulnerabilities found (for screenshot)
-          ignore-unfixed: true # Ignore issues that don't have a fix yet
-          vuln-type: 'os,library'
-          severity: 'HIGH,CRITICAL'
-          output: 'trivy-report.txt'
-      - name: Upload Trivy report
-        if: always()   # even if previous step fails
+          image-ref: demo-node:latest
+          format: table
+          output: trivy-report.txt
+          severity: HIGH,CRITICAL
+          exit-code: 1
+
+      - name: Upload scan report
+        if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: trivy-scan-report
+          name: scan-report
           path: trivy-report.txt
-
